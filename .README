@@ -1,0 +1,8 @@
+## input
+ATPT_OFCDC_SC_CODE=M10(시도교육청코드)
+SD_SCHUL_CODE=8000075(표쥰학교코드)
+MMEAL_SC_CODE=1,2,3(식사코드)
+MLSV_YMD=yyymmdd(급식일자)
+
+##  output
+DDISH_NM(요리명)

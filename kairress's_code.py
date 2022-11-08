@@ -41,6 +41,7 @@ class Sticker(QtWidgets.QMainWindow):
                    (a0.globalY() - self.localPos.y())]
         self.move(*self.xy)
 
+    # absolute positioning
     def walk(self, from_xy, to_xy, speed=60):
         self.from_xy = from_xy
         self.to_xy = to_xy
@@ -49,15 +50,13 @@ class Sticker(QtWidgets.QMainWindow):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.__walkHandler)
         self.timer.start(1000 / self.speed)
-
-    # 초기 위치로부터의 상대적 거리를 이용한 walk
+        
+    # relative positioning
     def walk_diff(self, from_xy_diff, to_xy_diff, speed=60, restart=False):
-        self.from_xy_diff = from_xy_diff
-        self.to_xy_diff = to_xy_diff
-        self.from_xy = [self.xy[0] + self.from_xy_diff[0],
-                        self.xy[1] + self.from_xy_diff[1]]
-        self.to_xy = [self.xy[0] + self.to_xy_diff[0],
-                      self.xy[1] + self.to_xy_diff[1]]
+        self.from_xy = [self.xy[0] + from_xy_diff[0],
+                        self.xy[1] + from_xy_diff[1]]
+        self.to_xy = [self.xy[0] + to_xy_diff[0],
+                      self.xy[1] + to_xy_diff[1]]
         self.speed = speed
         if restart:
             self.timer.start()
