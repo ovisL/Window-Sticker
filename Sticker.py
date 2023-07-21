@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtGui import QMovie
+from menu import return_menu, call_hour, pretty_date, call_ymd, return_nextday
 
 
 class Sticker(QtWidgets.QMainWindow):
@@ -19,10 +20,9 @@ class Sticker(QtWidgets.QMainWindow):
         self.on_top = on_top
         self.localPos = None
 
-        self.setupUi()
+        self.setupUI()
         self.show()
 
-    # 마우스 놓았을 때
     def mouseReleaseEvent(self, a0: QtGui.QMouseEvent):
         if self.to_xy_diff == [0, 0] and self.from_xy_diff == [0, 0]:
             pass
@@ -30,18 +30,15 @@ class Sticker(QtWidgets.QMainWindow):
             self.walk_diff(self.from_xy_diff, self.to_xy_diff,
                            self.speed, restart=True)
 
-    # 마우스 눌렀을 때
     def mousePressEvent(self, a0: QtGui.QMouseEvent):
         self.localPos = a0.localPos()
 
-    # 드래그 할 때
     def mouseMoveEvent(self, a0: QtGui.QMouseEvent):
         self.timer.stop()
         self.xy = [(a0.globalX() - self.localPos.x()),
                    (a0.globalY() - self.localPos.y())]
         self.move(*self.xy)
 
-    # absolute positioning
     def walk(self, from_xy, to_xy, speed=60):
         self.from_xy = from_xy
         self.to_xy = to_xy
@@ -50,8 +47,7 @@ class Sticker(QtWidgets.QMainWindow):
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.__walkHandler)
         self.timer.start(1000 / self.speed)
-        
-    # relative positioning
+
     def walk_diff(self, from_xy_diff, to_xy_diff, speed=60, restart=False):
         self.from_xy = [self.xy[0] + from_xy_diff[0],
                         self.xy[1] + from_xy_diff[1]]
@@ -87,7 +83,7 @@ class Sticker(QtWidgets.QMainWindow):
 
         self.move(*self.xy)
 
-    def setupUi(self):
+    def setupUI(self):
         centralWidget = QtWidgets.QWidget(self)
         self.setCentralWidget(centralWidget)
 
@@ -111,14 +107,55 @@ class Sticker(QtWidgets.QMainWindow):
 
         self.setGeometry(self.xy[0], self.xy[1], w, h)
 
+        threeMeal = [' 아침',' 점심',' 저녁']
+        date = call_ymd()
+        if call_hour() < 7:
+            slot = 1
+        elif call_hour() >= 7 and call_hour() < 13:
+            slot = 2
+        elif call_hour() >= 13 and call_hour() < 19:
+            slot = 3
+        else:
+            slot = 1
+            date = return_nextday(call_ymd())
+        meal = return_menu(slot,date)
+        # meal.insert(0,pretty_date()+threeMeal[slot-1])
+             
+        meal = '\n'.join(meal)
+        
+        self.label_title = QtWidgets.QLabel(pretty_date()+threeMeal[slot-1])
+        self.label_title.setStyleSheet("color: black;"
+                                      "background-color: white;"
+                                      "font-weight:600;"
+                                      "border-radius: 3px")
+        self.label_title.setFont(QtGui.QFont("Nanumbarungothic", 13))
+        self.label_menu = QtWidgets.QLabel(meal)
+        self.label_menu.setStyleSheet("color: black;"
+                                      "background-color: white;"
+                                      #  "border-style: solid;"
+                                      #  "border-width: 2px;"
+                                      #  "border-color: white;"
+
+                                      "border-radius: 3px")
+        self.label_menu.setFont(QtGui.QFont("Nanumbarungothic", 13))
+        vbox = QtWidgets.QVBoxLayout()
+        vbox.addWidget(self.label_title)
+        vbox.addWidget(self.label_menu)
+        vbox.addWidget(label)
+        centralWidget.setLayout(vbox)
+        self.label_title.hide()
+        self.label_menu.hide()
+
     def mouseDoubleClickEvent(self, e):
-        QtWidgets.qApp.quit()
+        # QtWidgets.qApp.quit()
+        self.label_title.show()
+        self.label_menu.show()
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
-    s = Sticker('bird.gif', xy=[-80, 200],size=1,on_top=True)
+    s = Sticker('bird.gif', xy=[433, 800], size=1, on_top=True)
     # s.walk_diff([0,0],[1000,0],1000)
     # s1 = Sticker('gif/amongus/red_vent.gif', xy=[780, 1020], size=0.3, on_top=True)
 
